@@ -164,8 +164,15 @@ public class DiscordIntegration extends ListenerAdapter {
         TextChannel relay = getRelayChannel();
         if(relay != null){
             try{
-                if(complete) relay.getManager().setTopic(status).complete();
-                else relay.getManager().setTopic(status).queue();
+                // do not "complete()"! channel topic updates can sometimes take 10 minutes,
+                // preventing the bot from turning off for that time and freezing the server!!!
+                if(complete){
+                    // I guess I'll solve this another way in the future??
+                    //relay.getManager().setTopic(status).complete();
+                }
+                else {
+                    relay.getManager().setTopic(status).queue();
+                }
             }catch(Exception e){
                 relay.sendMessage("bruh I can't edit the topic of this channel. make sure i have perms.").queue();
             }
