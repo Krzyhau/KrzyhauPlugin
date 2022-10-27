@@ -1,0 +1,7 @@
+name: KrzyhauPlugin
+version: '${project.version}'
+main: pl.krzyhau.krzyhauplugin.KrzyhauPlugin
+api-version: 1.19
+authors: [ Krzyhau ]
+description: A plugin for handling variety of stuff on Krzyhau's Minecraft Server
+website: https://discord.gg/GF62QBuZc7

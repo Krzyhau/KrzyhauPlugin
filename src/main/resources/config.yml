@@ -1,0 +1,7 @@
+whitelist: true
+botToken: null
+relayChannelId: 0
+whitelistChannelId: 0
+whitelistRoleId: 0
+webhookUrl: https://discord.com/api/webhooks/xxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
