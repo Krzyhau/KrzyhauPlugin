@@ -6,7 +6,7 @@
 
     <groupId>pl.krzyhau</groupId>
     <artifactId>KrzyhauPlugin</artifactId>
-    <version>0.001</version>
+    <version>0.002</version>
     <packaging>jar</packaging>
 
     <name>KrzyhauPlugin</name>

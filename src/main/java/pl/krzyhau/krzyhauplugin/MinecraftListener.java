@@ -12,10 +12,8 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MinecraftListener implements Listener {
@@ -53,6 +51,8 @@ public class MinecraftListener implements Listener {
         msgBuilder.setAvatarUrl(String.format("https://crafatar.com/renders/head/%s?default=MHF_Steve&overlay",event.getPlayer().getUniqueId()));
         msgBuilder.setContent("*<:krzyPepega:892473904482881566>*");
         discord.getWebhook().send(msgBuilder.build());
+
+        discord.onMinecraftPlayerCountUpdated(plugin.getServer().getOnlinePlayers().size());
     }
 
     @EventHandler
@@ -62,6 +62,27 @@ public class MinecraftListener implements Listener {
         msgBuilder.setAvatarUrl(String.format("https://crafatar.com/renders/head/%s?default=MHF_Steve&overlay",event.getPlayer().getUniqueId()));
         msgBuilder.setContent("*<:krzyOhNoes:892507900491206717>*");
         discord.getWebhook().send(msgBuilder.build());
+
+        discord.onMinecraftPlayerCountUpdated(plugin.getServer().getOnlinePlayers().size());
+    }
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event)
+    {
+        WebhookMessageBuilder msgBuilder = new WebhookMessageBuilder();
+        msgBuilder.setUsername(serializeForDiscord(event.deathMessage()));
+        msgBuilder.setAvatarUrl(String.format("https://crafatar.com/renders/head/%s?default=MHF_Steve&overlay",event.getPlayer().getUniqueId()));
+        msgBuilder.setContent("*<:krzyWarCrimes:834897863669973023>*");
+        discord.getWebhook().send(msgBuilder.build());
+    }
+
+    @EventHandler
+    public void onAdvancement(PlayerAdvancementDoneEvent event)
+    {
+        WebhookMessageBuilder msgBuilder = new WebhookMessageBuilder();
+        msgBuilder.setUsername(serializeForDiscord(event.message()));
+        msgBuilder.setAvatarUrl(String.format("https://crafatar.com/renders/head/%s?default=MHF_Steve&overlay",event.getPlayer().getUniqueId()));
+        msgBuilder.setContent("*<:krzyUuu:892471216940671006>*");
+        discord.getWebhook().send(msgBuilder.build());
     }
 
     @EventHandler
@@ -69,16 +90,20 @@ public class MinecraftListener implements Listener {
         if(discord.getAdapter().getStatus() != JDA.Status.CONNECTED) return;
 
         String name = event.getPlayer().getName();
-        String message = PlainTextComponentSerializer.plainText().serialize(event.message())
-                .replace("\\", "\\\\")
-                .replace("@", "\\@\u200D")
-                .replace("`", "\\`")
-                .replace("§", "\\§");
+        String message = serializeForDiscord(event.message());
 
         WebhookMessageBuilder msgBuilder = new WebhookMessageBuilder();
         msgBuilder.setUsername(name);
         msgBuilder.setAvatarUrl(String.format("https://crafatar.com/avatars/%s?default=MHF_Steve&overlay",event.getPlayer().getUniqueId()));
         msgBuilder.setContent(message);
         discord.getWebhook().send(msgBuilder.build());
+    }
+
+    private String serializeForDiscord(Component message){
+        return PlainTextComponentSerializer.plainText().serialize(message)
+                .replace("\\", "\\\\")
+                .replace("@", "\\@\u200D")
+                .replace("`", "\\`")
+                .replace("§", "\\§");
     }
 }

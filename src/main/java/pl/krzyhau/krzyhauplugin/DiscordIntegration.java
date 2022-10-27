@@ -40,7 +40,7 @@ public class DiscordIntegration extends ListenerAdapter {
         super();
         plugin = javaPlugin;
         adapter = JDABuilder.createDefault(plugin.getConfig().getString("botToken"))
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MEMBERS)
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
                 .addEventListeners(this)
                 .setMemberCachePolicy(member -> true)
                 .setActivity(Activity.playing("Minecraft"))
@@ -54,6 +54,7 @@ public class DiscordIntegration extends ListenerAdapter {
 
     public void cleanUp(){
         //whitelistBtnMessage.delete().timeout(10, TimeUnit.SECONDS).complete(); // wait for message to be deleted
+        setRelayChatStatus("Server is currently offline.", true);
         webhook.close();
         adapter.shutdownNow();
     }
@@ -88,6 +89,8 @@ public class DiscordIntegration extends ListenerAdapter {
         if(getWhitelistRequestChannel() == null){
             plugin.getLogger().log(Level.WARNING, "Invalid whitelist button channel ID detected! Make sure to change it in config.yml");
         }
+
+        onMinecraftPlayerCountUpdated(0);
     }
 
     @Override
@@ -151,6 +154,21 @@ public class DiscordIntegration extends ListenerAdapter {
         event.getGuild().addRoleToMember(event.getAuthor(), mcRole).queue();
 
         replyThenDeleteBoth(event, String.format("Your whitelisted nickname has been set to **%s**!", newUsername));
+    }
 
+    public void onMinecraftPlayerCountUpdated(int playerCount){
+        setRelayChatStatus(String.format("Players online: %d", playerCount), false);
+    }
+
+    public void setRelayChatStatus(String status, boolean complete){
+        TextChannel relay = getRelayChannel();
+        if(relay != null){
+            try{
+                if(complete) relay.getManager().setTopic(status).complete();
+                else relay.getManager().setTopic(status).queue();
+            }catch(Exception e){
+                relay.sendMessage("bruh I can't edit the topic of this channel. make sure i have perms.").queue();
+            }
+        }
     }
 }
